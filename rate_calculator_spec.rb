@@ -77,3 +77,24 @@ describe TimeChecker do
 		expect(time_checker.is_subrange_in_superrange?).to eq(false)
 	end
 end
+
+describe Director do
+	it "returns 2000 for Friday 10:00 - 12:00" do
+		ARGV = ["2015-07-10T10:00:00Z", "2015-07-10T12:00:00Z"]
+		director = Director.new
+		expect(director.direct).to eq(2000)
+	end
+
+	it "returns unavailable for Friday 03:00 - 12:00" do
+		ARGV = ["2015-07-10T03:00:00Z", "2015-07-10T12:00:00Z"]
+		director = Director.new
+		expect(director.direct).to eq("unavailable")		
+	end
+
+	it "returns invalid range for Friday 03:00 - 12:00" do
+		ARGV = ["2015-07-10T12:00:00Z", "2015-07-10T03:00:00Z"]
+		director = Director.new
+		expect(director.direct).to eq("invalid range")		
+	end
+
+end

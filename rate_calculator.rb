@@ -47,7 +47,7 @@ class RatesParser
 	def assign_time_ranges_to_days
 		raw_rates_array.each do |rate|
 			rate["days"].split(",").each do |day|
-				daily_rates[day] = {rate["times"] => rate["price"]}
+				daily_rates[day][rate["times"]] = rate["price"]
 			end
 		end
 	end
@@ -73,20 +73,35 @@ class TimeChecker
 	end
 end
 
-# class Director
-# 	attr_accessor :argument_handler, :day_extractor, :rates_parser, :time_range
+class Director
+	attr_accessor :argument_handler, :day_extractor, :rates_parser, :time_range
 
-# 	def initialize
-# 		@argument_handler = ArgumentHandler.new
-# 		@day_extractor = DayExtractor.new
-# 		@rates_parser = RatesParser.new(File.read('rates.json'))
-# 		@time_checker = TimeChecker.new
-# 	end
+	def initialize
+		@argument_handler = ArgumentHandler.new
+		@day_extractor = DayExtractor.new
+		@rates_parser = RatesParser.new(File.read('rates.json'))
+	end
 
-# 	def direct
-# 		start_day = day_extractor.get_day(argument_handler.start_date)
-# 		end_day = day_extractor.get_day(argument_handler.end_date)
-# 	end
-# end
+	def direct
+		start_day = day_extractor.get_day(argument_handler.start_date)
+		end_day = day_extractor.get_day(argument_handler.end_date)
+		return "invalid range" if argument_handler.start_date.to_time.to_i >= argument_handler.end_date.to_time.to_i
+		return "unavailable" if start_day != end_day
+		this_day_rates = rates_parser.daily_rates[start_day]
+		this_day_rates.each do |range, price|
+			this_args = {"subrange_low" => argument_handler.start_date,
+									 "subrange_high" => argument_handler.end_date,
+									 "superrange" => range}
+			time_checker = TimeChecker.new(this_args)
+			if time_checker.is_subrange_in_superrange?
+				return price
+			end
+		end
+		return "unavailable"
+	end
+end
+
+director = Director.new
+p director.direct
 
 # p RatesParser.new(File.read("rates.json")).daily_rates
