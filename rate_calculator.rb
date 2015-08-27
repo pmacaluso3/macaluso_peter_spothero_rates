@@ -2,6 +2,7 @@ require "json"
 require "date"
 
 
+
 class DayExtractor
 	attr_reader :start_date, :end_date, :start_day, :end_day
 
