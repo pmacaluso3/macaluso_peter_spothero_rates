@@ -1,15 +1,19 @@
 require "json"
 require "date"
 
-
-
-class DayExtractor
-	attr_reader :start_date, :end_date, :start_day, :end_day
+class ArgumentHandler
+	attr_reader :start_date, :end_date
 
 	def initialize
-		@input = ARGV
-		@start_date = DateTime.parse(@input[0])
-		@end_date = DateTime.parse(@input[1])
+		@start_date = DateTime.parse(ARGV[0])
+		@end_date = DateTime.parse(ARGV[1])
+	end
+end
+
+class DayExtractor
+	attr_reader :day_map
+
+	def initialize
 		@day_map = {"1" => "mon",
 								"2" => "tues",
 								"3" => "wed",
@@ -17,8 +21,10 @@ class DayExtractor
 								"5" => "fri",
 								"6" => "sat",
 								"7" => "sun"}
-		@start_day = @day_map[start_date.cwday.to_s]
-		@end_day = @day_map[end_date.cwday.to_s]
+	end
+
+	def get_day(datetime_object)
+		self.day_map[datetime_object.cwday.to_s]
 	end
 end
 
