@@ -34,20 +34,20 @@ class RatesParser
 
 	def initialize(incoming_json)
 		@raw_rates_array = JSON.parse(incoming_json)["rates"]
-		@daily_rates = {"mon" => [], 
-						 "tues" => [], 
-						 "wed" => [], 
-						 "thurs" => [], 
-						 "fri" => [], 
-						 "sat" => [], 
-						 "sun" => []}
+		@daily_rates = {"mon" => {}, 
+						 "tues" => {}, 
+						 "wed" => {}, 
+						 "thurs" => {}, 
+						 "fri" => {}, 
+						 "sat" => {}, 
+						 "sun" => {}}
 		self.assign_time_ranges_to_days
 	end
 
 	def assign_time_ranges_to_days
 		raw_rates_array.each do |rate|
 			rate["days"].split(",").each do |day|
-				daily_rates[day] << {rate["times"] => rate["price"]}
+				daily_rates[day] = {rate["times"] => rate["price"]}
 			end
 		end
 	end
@@ -73,5 +73,20 @@ class TimeChecker
 	end
 end
 
+# class Director
+# 	attr_accessor :argument_handler, :day_extractor, :rates_parser, :time_range
+
+# 	def initialize
+# 		@argument_handler = ArgumentHandler.new
+# 		@day_extractor = DayExtractor.new
+# 		@rates_parser = RatesParser.new(File.read('rates.json'))
+# 		@time_checker = TimeChecker.new
+# 	end
+
+# 	def direct
+# 		start_day = day_extractor.get_day(argument_handler.start_date)
+# 		end_day = day_extractor.get_day(argument_handler.end_date)
+# 	end
+# end
 
 # p RatesParser.new(File.read("rates.json")).daily_rates
