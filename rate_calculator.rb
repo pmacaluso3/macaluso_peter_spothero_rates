@@ -52,3 +52,26 @@ class RatesParser
 		end
 	end
 end
+
+class TimeChecker
+	attr_reader :subrange_low, :subrange_high, :superrange
+
+	def initialize(args)
+		@subrange_low = self.datetime_object_to_four_digit_time(args["subrange_low"])
+		@subrange_high = self.datetime_object_to_four_digit_time(args["subrange_high"])
+		@superrange = args["superrange"]
+	end
+
+	def datetime_object_to_four_digit_time(datetime_object)
+		time_with_colons = datetime_object.to_time.to_s.split(" ")[1]
+		four_digit_time = time_with_colons.split(":")[0..1].join.to_i
+	end
+
+	def is_subrange_in_superrange?
+		time_range = superrange.split("-").map{|t|t.to_i}
+		time_range[0] <= (self.subrange_low + 500)%2400 && time_range[1] >= (self.subrange_high + 500)%2400
+	end
+end
+
+
+# p RatesParser.new(File.read("rates.json")).daily_rates

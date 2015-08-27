@@ -50,3 +50,30 @@ describe RatesParser do
 		expect(rates_parser.daily_rates).to eq(expected_daily_rates)
 	end
 end
+
+describe TimeChecker do
+	two = DateTime.parse("2015-07-04T02:00:00Z")
+	four = DateTime.parse("2015-07-04T04:00:00Z")
+	six = DateTime.parse("2015-07-04T06:00:00Z")
+	eight = DateTime.parse("2015-07-04T08:00:00Z")
+
+	it "determines that 4 - 6 is within 2 - 8" do
+		time_checker = TimeChecker.new({"subrange_low" => four, "subrange_high" => six, "superrange" => "0200-0800"})
+		expect(time_checker.is_subrange_in_superrange?).to eq(true)
+	end
+
+	it "determines that 2 - 8 is not within 4 - 6" do
+		time_checker = TimeChecker.new({"subrange_low" => two, "subrange_high" => eight, "superrange" => "0400-0600"})
+		expect(time_checker.is_subrange_in_superrange?).to eq(false)
+	end
+
+	it "determines that 4 - 6 is within 4 - 6" do
+		time_checker = TimeChecker.new({"subrange_low" => four, "subrange_high" => six, "superrange" => "0400-0600"})
+		expect(time_checker.is_subrange_in_superrange?).to eq(true)
+	end
+
+	it "determines that 4 - 8 is not within 4 - 6" do
+		time_checker = TimeChecker.new({"subrange_low" => four, "subrange_high" => eight, "superrange" => "0400-0600"})
+		expect(time_checker.is_subrange_in_superrange?).to eq(false)
+	end
+end
