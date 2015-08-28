@@ -1,15 +1,19 @@
 require "json"
 require "date"
 
-
-
-class DayExtractor
-	attr_reader :start_date, :end_date, :start_day, :end_day
+class ArgumentHandler
+	attr_reader :start_date, :end_date
 
 	def initialize
-		@input = ARGV
-		@start_date = DateTime.parse(@input[0])
-		@end_date = DateTime.parse(@input[1])
+		@start_date = DateTime.parse(ARGV[0])
+		@end_date = DateTime.parse(ARGV[1])
+	end
+end
+
+class DayExtractor
+	attr_reader :day_map
+
+	def initialize
 		@day_map = {"1" => "mon",
 								"2" => "tues",
 								"3" => "wed",
@@ -17,8 +21,10 @@ class DayExtractor
 								"5" => "fri",
 								"6" => "sat",
 								"7" => "sun"}
-		@start_day = @day_map[start_date.cwday.to_s]
-		@end_day = @day_map[end_date.cwday.to_s]
+	end
+
+	def get_day(datetime_object)
+		self.day_map[datetime_object.cwday.to_s]
 	end
 end
 
@@ -46,3 +52,26 @@ class RatesParser
 		end
 	end
 end
+
+class TimeChecker
+	attr_reader :subrange_low, :subrange_high, :superrange
+
+	def initialize(args)
+		@subrange_low = self.datetime_object_to_four_digit_time(args["subrange_low"])
+		@subrange_high = self.datetime_object_to_four_digit_time(args["subrange_high"])
+		@superrange = args["superrange"]
+	end
+
+	def datetime_object_to_four_digit_time(datetime_object)
+		time_with_colons = datetime_object.to_time.to_s.split(" ")[1]
+		four_digit_time = time_with_colons.split(":")[0..1].join.to_i
+	end
+
+	def is_subrange_in_superrange?
+		time_range = superrange.split("-").map{|t|t.to_i}
+		time_range[0] <= (self.subrange_low + 500)%2400 && time_range[1] >= (self.subrange_high + 500)%2400
+	end
+end
+
+
+# p RatesParser.new(File.read("rates.json")).daily_rates
