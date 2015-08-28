@@ -103,5 +103,3 @@ end
 
 director = Director.new
 p director.direct
-
-# p RatesParser.new(File.read("rates.json")).daily_rates
